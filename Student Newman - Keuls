@@ -1,0 +1,38 @@
+# Student Newman -Keuls test
+head(RCBD_Trial_Rice)
+str(RCBD_Trial_Rice)
+RCBD_Trial_Rice$Rep=as.factor(RCBD_Trial_Rice$Rep)
+RCBD_Trial_Rice$Fertilizer=as.factor(RCBD_Trial_Rice$Fertilizer)
+RCBD_Trial_Rice$Variety=as.factor(RCBD_Trial_Rice$Variety)
+attach(RCBD_Trial_Rice)
+mana=aov(GY_kg_ha~Variety+Fertilizer+Rep+Variety*Fertilizer)
+anova(mana)
+library(agricolae)
+# to look effects of Variety
+outV <- SNK.test(mana,"Variety", console=TRUE, 
+                main="Yield of Rice. Dealt with different variety")
+#to look effects of Fertilzers
+outF <- SNK.test(mana,"Fertilizer", console=TRUE, 
+                 main="Yield of Rice. Dealt with different Fertilizer")
+# to look  for Variety and Fertilzers interaction effects
+outFVI <- SNK.test(GY_kg_ha,Variety:Fertilizer,33,51302,alpha=0.05
+                   ,group=TRUE,main="Yield of Rice.Dealt with interaction of
+                 Fertilizerand Variety",console=TRUE)
+#####################################################################################################################################################
+to create boxplot
+#####################################################################################################################################################
+library(ggplot2)
+install.packages("RColorBrewer")
+library(RColorBrewer)
+# Box plot
+theme<- theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(colour = "black"))
+
+p<-ggplot(data=RCBD_Trial_Rice, aes(x=Fertilizer, y=GY_kg_ha, fill=Fertilizer)) +
+  geom_boxplot() +facet_grid(~Variety) + theme
+
+
+p + scale_fill_brewer(palette = "RdBu") +labs (x="Treatment combination", y="Grain Yield(Kg/ha)")
+ggsave("manaaap.png", width = 6.2, height = 3, dpi = 1000)
